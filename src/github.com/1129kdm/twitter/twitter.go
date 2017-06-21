@@ -14,7 +14,7 @@ func envLoad() {
 	}
 }
 
-func AuthTwitterApi() {
+func AuthTwitterApi() *anaconda.TwitterApi {
 	envLoad()
 	anaconda.SetConsumerKey(Getenv("TWITTER_CONSUMER_KEY"))
 	anaconda.SetConsumerSecret(Getenv("TWITTER_CONSUMER_SECRET"))
