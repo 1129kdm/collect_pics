@@ -1,30 +1,58 @@
 package main
 
 import (
-	"fmt"
-	"github.com/1129kdm/haraeki"
+	"github.com/1129kdm/services"
 	"github.com/1129kdm/twitter"
-	"net/url"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	//"net/url"
 )
 
 func main() {
 	twitterApi := twitter.AuthTwitterApi()
-	v := url.Values{}
-	v.Set("screen_name", "nakano_aimi")
-	v.Set("count", "1")
 
-	tweets, err := twitterApi.GetUserTimeline(v)
-	if err != nil {
-		panic(err)
-	}
+	for _, screenName := range util.TwitterNames() {
+		tweets, err := twitterApi.GetUserTimeline(util.CreateUrlValues(screenName))
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	for _, tweet := range tweets {
-		if tweet.Entities.Media != nil {
-			imgUrl := tweet.Entities.Media[0].Media_url
-			fmt.Println("tweet: ", imgUrl)
+		var imgUrls []string
+		for _, tweet := range tweets {
+			if tweet.Entities.Media != nil {
+				imgUrls = append(imgUrls, tweet.Entities.Media[0].Media_url)
+			}
+		}
+		if imgUrls == nil {
+			log.Printf("warn: " + screenName + "'s imgUrls is nil")
+			continue
+		}
+
+		mkDirExistErr := util.MakeImgSaveDirectory(screenName)
+		if mkDirExistErr != nil {
+			log.Printf("warn: " + mkDirExistErr.Error())
+		}
+
+		for _, url := range imgUrls {
+			response, err := http.Get(url)
+			if err != nil {
+				log.Printf("error: " + err.Error())
+				continue
+			}
+			defer response.Body.Close()
+
+			var imgPath = util.CreateSaveImgPath(util.ExtractImgNameFromUrl(url), screenName)
+			file, err := os.Create(imgPath)
+			if err != nil {
+				log.Printf("error: %d", err.Error())
+			}
+			defer file.Close()
+
+			io.Copy(file, response.Body)
 		}
 	}
 
-	fmt.Println(haraeki.MemberTwitterNames())
-	twitterApi.Close()
+	defer twitterApi.Close()
 }
