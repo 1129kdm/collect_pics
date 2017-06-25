@@ -34,6 +34,10 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+
+			if len(tweets) == 0 {
+				continue
+			}
 			for _, tweet := range tweets {
 				if tweet.Entities.Media != nil {
 					imgUrls = append(imgUrls, tweet.Entities.Media[0].Media_url)
