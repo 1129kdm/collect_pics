@@ -7,24 +7,42 @@ import (
 	"log"
 	"net/http"
 	"os"
-	//"net/url"
+	"strconv"
 )
 
 func main() {
 	twitterApi := twitter.AuthTwitterApi()
 
 	for _, screenName := range util.TwitterNames() {
-		tweets, err := twitterApi.GetUserTimeline(util.CreateUrlValues(screenName))
+		log.Printf("info: get user timeline of " + screenName)
+
+		var tweetsParams = util.CreateTweetsParams(screenName)
+		initTweets, err := twitterApi.GetUserTimeline(tweetsParams)
 		if err != nil {
 			log.Fatal(err)
 		}
 
+		// initial max_id
+		var maxId = initTweets[0].Id
 		var imgUrls []string
-		for _, tweet := range tweets {
-			if tweet.Entities.Media != nil {
-				imgUrls = append(imgUrls, tweet.Entities.Media[0].Media_url)
+
+		// 遡れる上限が3200tweet (16 x 200)
+		for i := 1; i <= 16; i++ {
+			// 指定したmax_id以下のtweetを取得する
+			tweetsParams.Set("max_id", strconv.FormatInt(maxId, 10))
+			tweets, err := twitterApi.GetUserTimeline(tweetsParams)
+			if err != nil {
+				log.Fatal(err)
 			}
+			for _, tweet := range tweets {
+				if tweet.Entities.Media != nil {
+					imgUrls = append(imgUrls, tweet.Entities.Media[0].Media_url)
+				}
+			}
+			// 最後のId - 1 をしないと取得するツイートの初めが重複する
+			maxId = tweets[len(tweets)-1].Id - 1
 		}
+
 		if imgUrls == nil {
 			log.Printf("warn: " + screenName + "'s imgUrls is nil")
 			continue

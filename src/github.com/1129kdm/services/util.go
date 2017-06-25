@@ -8,7 +8,7 @@ import (
 
 const (
 	SAVE_IMG_PATH = "/tmp/"
-	GET_TWEET_NUM = "10"
+	GET_TWEET_NUM = "200"
 	URL_SEPARATE  = "/"
 )
 
@@ -20,7 +20,7 @@ func MakeImgSaveDirectory(screenName string) error {
 	return os.Mkdir(SAVE_IMG_PATH+screenName, 0777)
 }
 
-func CreateUrlValues(screenName string) url.Values {
+func CreateTweetsParams(screenName string) url.Values {
 	v := url.Values{}
 	v.Set("screen_name", screenName)
 	v.Set("count", GET_TWEET_NUM)
