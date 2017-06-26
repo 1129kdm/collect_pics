@@ -38,15 +38,21 @@ func main() {
 			if len(tweets) == 0 {
 				continue
 			}
+
 			for _, tweet := range tweets {
 				if tweet.Entities.Media != nil {
+					// ローカルに存在している画像が見つかったらツイート取得ループを抜ける
+					if util.ImgExist(util.ExtractImgNameFromUrl(tweet.Entities.Media[0].Media_url), screenName) == true {
+						log.Printf("info: " + screenName + "'s img exist at " + strconv.Itoa(i) + " loop.")
+						goto URL_CHECK
+					}
 					imgUrls = append(imgUrls, tweet.Entities.Media[0].Media_url)
 				}
 			}
 			// 最後のId - 1 をしないと取得するツイートの初めが重複する
 			maxId = tweets[len(tweets)-1].Id - 1
 		}
-
+	URL_CHECK:
 		if imgUrls == nil {
 			log.Printf("warn: " + screenName + "'s imgUrls is nil")
 			continue

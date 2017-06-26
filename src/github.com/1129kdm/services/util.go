@@ -13,7 +13,7 @@ const (
 )
 
 func TwitterNames() (m []string) {
-	return []string{"nakano_aimi", "kei_azm"}
+	return []string{"kei_azm", "nanako_taya", "sena_akasaka"}
 }
 
 func MakeImgSaveDirectory(screenName string) error {
@@ -34,4 +34,9 @@ func ExtractImgNameFromUrl(url string) string {
 
 func CreateSaveImgPath(imgName string, screenName string) string {
 	return SAVE_IMG_PATH + screenName + "/" + imgName
+}
+
+func ImgExist(imgName string, screenName string) bool {
+	_, err := os.Stat(SAVE_IMG_PATH + screenName + "/" + imgName)
+	return err == nil
 }
