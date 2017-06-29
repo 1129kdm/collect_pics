@@ -56,6 +56,8 @@ func main() {
 		if imgUrls == nil {
 			log.Printf("warn: " + screenName + "'s imgUrls is nil")
 			continue
+		} else {
+			log.Printf("info: " + screenName + "'s imgUrls counts=" + strconv.Itoa(len(imgUrls)))
 		}
 
 		mkDirExistErr := util.MakeImgSaveDirectory(screenName)
