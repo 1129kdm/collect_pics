@@ -13,7 +13,7 @@ const (
 )
 
 func TwitterNames() (m []string) {
-	return []string{"kei_azm", "nanako_taya", "sena_akasaka"}
+	return []string{"kei_azm", "nanako_taya", "sena_akasaka", "hiratsuka_hina", "marin_makino"}
 }
 
 func MakeImgSaveDirectory(screenName string) error {
